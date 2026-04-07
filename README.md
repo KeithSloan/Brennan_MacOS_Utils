@@ -6,7 +6,12 @@ Utilities for managing and transferring music on macOS, specifically for the **B
 
 ## Process Qobuz FLAC for Brennan
 
-Downloads from [Qobuz](https://www.qobuz.com) embed artwork inside FLAC files. This causes playback problems on the Brennan B3+ and Sonos. This utility strips the embedded artwork losslessly (audio and all metadata tags are fully preserved) and writes the processed files to `~/Music/BrennanMusic/Transfer/` ready for copying to a NAS or directly to the Brennan.
+Downloads from [Qobuz](https://www.qobuz.com) embed artwork inside FLAC files, and hi-res tracks may be at sample rates (e.g. 88.2 kHz, 96 kHz, 192 kHz) that the Brennan B3+ and Sonos cannot play. This utility:
+
+- **Strips embedded artwork** losslessly (audio and all metadata tags are fully preserved)
+- **Downsamples to 48 kHz** any file with a sample rate above 48 kHz (files at 44.1 kHz or 48 kHz are copied unchanged)
+
+Processed files are written to `~/Music/BrennanMusic/Transfer/` ready for copying to a NAS or directly to the Brennan. A log of all artwork removals and resampling operations is written to `~/Music/BrennanMusic/process_qobuz_flac.log`.
 
 ### Requirements
 
@@ -37,11 +42,27 @@ Processed files are written to:
   Artists/
     Artist Name/
       Album Name/
-        01 - Track.flac   ← artwork stripped, audio identical
+        01 - Track.flac   ← artwork stripped, downsampled if needed
         ...
 ```
 
 The transfer directory is **cleared on each run** so it always contains only the most recently processed batch.
+
+A log is written to `~/Music/BrennanMusic/process_qobuz_flac.log` listing every file where artwork was removed or resampling occurred, plus a summary count. Example:
+
+```
+Process Qobuz FLAC — 2026-04-07 14:32:01
+Source: /Users/you/Music/QoBuz_Digital
+---
+  [artwork removed] Artist/Album/01 - Track.flac
+  [artwork removed, resampled 96000Hz → 48000Hz] Artist/Album/02 - Track.flac
+  [resampled 192000Hz → 48000Hz] Artist/Album/03 - Track.flac
+---
+Processed : 12
+Artwork removed : 8
+Resampled : 3
+Completed : 2026-04-07 14:32:45
+```
 
 ---
 
@@ -95,6 +116,6 @@ bash ~/github/Brennan_MacOS_Utils/scripts/process_qobuz_flac.sh ~/Music/QoBuz_Di
 
 | File | Purpose |
 |------|---------|
-| `scripts/process_qobuz_flac.sh` | Core processing script — strips artwork, writes to Transfer dir |
+| `scripts/process_qobuz_flac.sh` | Core processing script — strips artwork, downsamples if >48 kHz, writes log |
 | `automator/ProcessQobuzFLAC.applescript` | AppleScript source for the BrennanTransfer app |
 | `install_automator_app.sh` | Compiles and installs BrennanTransfer.app to `/Applications` |
