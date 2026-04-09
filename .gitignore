@@ -1,3 +1,6 @@
 # Generated Automator bundles — built by install_automator_app.sh
 automator/*.app/
 automator/*.workflow/
+
+# Claude Code working files
+.claude/
