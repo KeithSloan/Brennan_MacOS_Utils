@@ -39,12 +39,13 @@ Processed files are written to:
 
 ```
 ~/Music/BrennanMusic/Transfer/
-  Artists/
-    Artist Name/
-      Album Name/
-        01 - Track.flac   ← artwork stripped, downsampled if needed
-        ...
+  Artist Name/
+    Album Name/
+      01 - Track.flac   ← artwork stripped, downsampled if needed
+      ...
 ```
+
+This matches the directory structure expected by the Brennan B3+ Web UI bulk upload.
 
 The transfer directory is **cleared on each run** so it always contains only the most recently processed batch.
 

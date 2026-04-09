@@ -70,6 +70,7 @@ RESAMPLED=0
 
 while IFS= read -r -d '' FLAC_FILE; do
     REL_PATH="${FLAC_FILE#"$SOURCE_DIR/"}"
+    REL_PATH="${REL_PATH#*/}"
     OUT_FILE="${TRANSFERS_ROOT}/${REL_PATH}"
     mkdir -p "$(dirname "$OUT_FILE")"
 
