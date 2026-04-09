@@ -67,12 +67,38 @@ Completed : 2026-04-07 14:32:45
 
 ---
 
+## Release Sonos Session
+
+When Spotify is active on a Sonos speaker via the iPhone app, it holds a Spotify Connect session that blocks the Brennan Web UI from taking control. This utility stops playback on the **Family Room** Sonos Five, releasing the session so the Brennan Web UI can take over.
+
+### Requirements
+
+- Python 3 with [SoCo](https://github.com/SoCo/SoCo):
+  ```bash
+  pip3 install soco
+  ```
+
+### Usage
+
+#### Double-click ReleaseSonosSession
+
+Double-click **ReleaseSonosSession** in `/Applications`. A notification confirms the speaker is released.
+
+#### Command line
+
+```bash
+bash ~/github/Brennan_MacOS_Utils/scripts/release_sonos_session.sh
+```
+
+---
+
 ## Installation
 
-### 1. Install ffmpeg
+### 1. Install dependencies
 
 ```bash
 brew install ffmpeg
+pip3 install soco
 ```
 
 ### 2. Clone this repo
@@ -81,13 +107,15 @@ brew install ffmpeg
 git clone https://github.com/ksloan/Brennan_MacOS_Utils.git ~/github/Brennan_MacOS_Utils
 ```
 
-### 3. Install the BrennanTransfer app
+### 3. Install apps
 
 ```bash
 bash ~/github/Brennan_MacOS_Utils/install_automator_app.sh
 ```
 
-This compiles `automator/ProcessQobuzFLAC.applescript` into `/Applications/BrennanTransfer.app`.
+This compiles both AppleScripts and installs them to `/Applications`:
+- `BrennanTransfer.app` — process Qobuz FLAC files
+- `ReleaseSonosSession.app` — release Spotify Connect on the Family Room Sonos
 
 ---
 
@@ -118,5 +146,7 @@ bash ~/github/Brennan_MacOS_Utils/scripts/process_qobuz_flac.sh ~/Music/QoBuz_Di
 | File | Purpose |
 |------|---------|
 | `scripts/process_qobuz_flac.sh` | Core processing script — strips artwork, downsamples if >48 kHz, writes log |
+| `scripts/release_sonos_session.sh` | Stops playback on Family Room Sonos to release Spotify Connect session |
 | `automator/ProcessQobuzFLAC.applescript` | AppleScript source for the BrennanTransfer app |
-| `install_automator_app.sh` | Compiles and installs BrennanTransfer.app to `/Applications` |
+| `automator/ReleaseSonosSession.applescript` | AppleScript source for the ReleaseSonosSession app |
+| `install_automator_app.sh` | Compiles and installs both apps to `/Applications` |

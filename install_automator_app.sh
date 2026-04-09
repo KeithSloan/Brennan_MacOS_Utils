@@ -1,17 +1,19 @@
 #!/usr/bin/env bash
 # install_automator_app.sh
-# Compiles ProcessQobuzFLAC.applescript into BrennanTransfer.app
-# and installs it to /Applications.
+# Compiles AppleScripts into macOS apps and installs them to /Applications.
 
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
-APPLESCRIPT_SRC="${REPO_DIR}/automator/ProcessQobuzFLAC.applescript"
-APP_DEST="/Applications/BrennanTransfer.app"
 
-echo "Compiling BrennanTransfer.app ..."
+install_app() {
+    local src="$1"
+    local dest="$2"
+    echo "Compiling $(basename "$dest") ..."
+    rm -rf "$dest"
+    osacompile -o "$dest" "$src"
+    echo "Installed to ${dest}"
+}
 
-rm -rf "$APP_DEST"
-osacompile -o "$APP_DEST" "$APPLESCRIPT_SRC"
-
-echo "Installed to ${APP_DEST}"
+install_app "${REPO_DIR}/automator/ProcessQobuzFLAC.applescript"   "/Applications/BrennanTransfer.app"
+install_app "${REPO_DIR}/automator/ReleaseSonosSession.applescript" "/Applications/ReleaseSonosSession.app"
