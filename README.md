@@ -94,28 +94,71 @@ bash ~/github/Brennan_MacOS_Utils/scripts/release_sonos_session.sh
 
 ## Installation
 
-### 1. Install dependencies
+### 1. Install Homebrew (if not already installed)
+
+[Homebrew](https://brew.sh) is a macOS package manager. If you don't have it:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+Verify it's working:
+
+```bash
+brew --version
+```
+
+### 2. Install ffmpeg
+
+Required by the Qobuz FLAC processor:
 
 ```bash
 brew install ffmpeg
+```
+
+### 3. Install Python 3 (if not already installed)
+
+macOS includes Python 3, but if needed:
+
+```bash
+brew install python
+```
+
+Verify:
+
+```bash
+python3 --version
+```
+
+### 4. Install SoCo
+
+[SoCo](https://github.com/SoCo/SoCo) is a Python library for controlling Sonos speakers. Required by the Release Sonos Session utility:
+
+```bash
 pip3 install soco
 ```
 
-### 2. Clone this repo
+Verify:
 
 ```bash
-git clone https://github.com/ksloan/Brennan_MacOS_Utils.git ~/github/Brennan_MacOS_Utils
+python3 -c "import soco; print('SoCo OK')"
 ```
 
-### 3. Install apps
+### 5. Clone this repo
+
+```bash
+git clone https://github.com/KeithSloan/Brennan_MacOS_Utils.git ~/github/Brennan_MacOS_Utils
+```
+
+### 6. Install the macOS apps
 
 ```bash
 bash ~/github/Brennan_MacOS_Utils/install_automator_app.sh
 ```
 
 This compiles both AppleScripts and installs them to `/Applications`:
-- `BrennanTransfer.app` — process Qobuz FLAC files
-- `ReleaseSonosSession.app` — release Spotify Connect on the Family Room Sonos
+- **BrennanTransfer.app** — process Qobuz FLAC files for Brennan/Sonos
+- **ReleaseSonosSession.app** — release Spotify Connect on the Family Room Sonos
 
 ---
 
