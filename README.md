@@ -69,7 +69,7 @@ Completed : 2026-04-07 14:32:45
 
 ## Release Sonos Session
 
-When Spotify is active on a Sonos speaker via the iPhone app, it holds a Spotify Connect session that blocks the Brennan Web UI from taking control. This utility stops playback on the **Family Room** Sonos Five, releasing the session so the Brennan Web UI can take over.
+When Spotify is active on a Sonos speaker via the iPhone app, it holds a Spotify Connect session that blocks the Brennan Web UI from taking control. This utility discovers all Sonos speakers on the network, prompts you to pick one, then stops playback to release the session so the Brennan Web UI can take over.
 
 ### Requirements
 
@@ -82,7 +82,9 @@ When Spotify is active on a Sonos speaker via the iPhone app, it holds a Spotify
 
 #### Double-click ReleaseSonosSession
 
-Double-click **ReleaseSonosSession** in `/Applications`. A notification confirms the speaker is released.
+1. Double-click **ReleaseSonosSession** in `/Applications`
+2. A list of discovered Sonos speakers appears — select one and click OK
+3. A notification confirms the speaker is released
 
 #### Command line
 

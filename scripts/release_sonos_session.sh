@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # release_sonos_session.sh
-# Stops playback on the Sonos 'Family Room' speaker to release
-# any active Spotify Connect session, freeing it for the Brennan Web UI.
+# Discovers Sonos speakers on the network, prompts the user to pick one,
+# then stops playback to release any active Spotify Connect session,
+# freeing the speaker for the Brennan Web UI.
 #
 # Requires: pip3 install soco
 #
@@ -9,34 +10,48 @@
 
 set -euo pipefail
 
-SPEAKER_NAME="Family Room"
-
 if ! python3 -c "import soco" 2>/dev/null; then
     osascript -e 'display dialog "soco not installed.\nRun: pip3 install soco" buttons {"OK"} default button "OK" with icon stop'
     exit 1
 fi
 
-RESULT=$(python3 - <<PYEOF
-import soco, sys
+RESULT=$(python3 - <<'PYEOF'
+import soco, sys, subprocess
 
-name = "$SPEAKER_NAME"
-speakers = soco.discover(timeout=5) or []
-speaker = next((s for s in speakers if s.player_name == name), None)
+speakers = sorted(soco.discover(timeout=5) or [], key=lambda s: s.player_name)
 
+if not speakers:
+    print("ERR:No Sonos speakers found on network.")
+    sys.exit(1)
+
+names = [s.player_name for s in speakers]
+names_as = "{" + ", ".join(f'"{n}"' for n in names) + "}"
+script = f'choose from list {names_as} with prompt "Select Sonos speaker to release:" default items {{"{names[0]}"}}'
+
+result = subprocess.run(["osascript", "-e", script], capture_output=True, text=True)
+chosen = result.stdout.strip()
+
+if not chosen or chosen == "false":
+    print("CANCEL:")
+    sys.exit(0)
+
+speaker = next((s for s in speakers if s.player_name == chosen), None)
 if not speaker:
-    print(f"ERR:Speaker '{name}' not found on network.")
+    print(f"ERR:Speaker '{chosen}' not found.")
     sys.exit(1)
 
 try:
     speaker.stop()
-    print(f"OK:'{name}' released — Brennan Web UI can now take control.")
+    print(f"OK:'{chosen}' released — Brennan Web UI can now take control.")
 except Exception as e:
     print(f"ERR:{e}")
     sys.exit(1)
 PYEOF
 )
 
-if [[ "$RESULT" == OK:* ]]; then
+if [[ "$RESULT" == CANCEL:* ]]; then
+    exit 0
+elif [[ "$RESULT" == OK:* ]]; then
     osascript -e "display notification \"${RESULT#OK:}\" with title \"Sonos Release\""
     echo "${RESULT#OK:}"
 else
