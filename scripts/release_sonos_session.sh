@@ -36,11 +36,8 @@ speakers = sorted(soco.discover(timeout=10) or [], key=lambda s: s.player_name)
 
 if not speakers:
     # Discovery failed — fall back to direct IP connection
-    result = subprocess.run(
-        ["osascript", "-e",
-         'text returned of (display dialog "Sonos speaker not found automatically.\n'
-         'Enter the speaker\'s IP address:" default answer "" buttons {"Cancel", "OK"} default button "OK")'],
-        capture_output=True, text=True)
+    script = 'text returned of (display dialog "Sonos speaker not found automatically. Enter the speaker IP address:" default answer "" buttons {"Cancel", "OK"} default button "OK")'
+    result = subprocess.run(["osascript", "-e", script], capture_output=True, text=True)
     ip = result.stdout.strip()
     if not ip or ip == "false":
         print("CANCEL:")
