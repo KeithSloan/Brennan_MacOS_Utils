@@ -8,6 +8,7 @@ macOS utilities for managing and transferring music between [Qobuz](https://www.
 | `ReleaseSonosSession.app` | `release_sonos_session.sh` | Release a Spotify Connect session so the Brennan Web UI can take control |
 | `ListBrennanNAS.app` | `list_brennan_nas.sh` | List all artists, albums and track counts on the Brennan B3+ NAS |
 | `ListSonosLibrary.app` | `list_sonos_library.sh` | List all artists and albums indexed in the Sonos Music Library |
+| `CompareNASSonos.app` | `compare_nas_sonos.sh` | Report discrepancies between the B3+ NAS and the Sonos Music Library |
 
 ---
 
@@ -179,6 +180,38 @@ bash ~/github/Brennan_MacOS_Utils/scripts/list_sonos_library.sh
 
 ---
 
+## Compare NAS vs Sonos Music Library
+
+Compares the Brennan B3+ NAS contents with the Sonos Music Library index and reports any discrepancies:
+
+- **On NAS but missing from Sonos** — albums uploaded to the B3+ that Sonos has not yet indexed (trigger a library rescan in the Sonos app to fix)
+- **In Sonos but missing from NAS** — albums in the Sonos index with no matching folder on the NAS (deleted files or a metadata/folder name mismatch)
+
+Comparison is case-insensitive. The report is saved to `~/Music/BrennanMusic/nas_sonos_comparison.txt` and opened in TextEdit.
+
+### Requirements
+
+- NAS mode enabled on the B3+: **Settings & Tools → Maintenance → Start NAS**
+- At least one Sonos speaker on the network with a Music Library configured
+- Python 3 with [SoCo](https://github.com/SoCo/SoCo):
+  ```bash
+  pip3 install soco
+  ```
+
+### Usage
+
+**Double-click CompareNASSonos:**
+1. Double-click **CompareNASSonos** in `/Applications`
+2. Enter the B3+'s IP address when prompted
+3. The comparison report opens in TextEdit
+
+**Command line:**
+```bash
+bash ~/github/Brennan_MacOS_Utils/scripts/compare_nas_sonos.sh 192.168.x.x
+```
+
+---
+
 ## Configuring the Brennan B3+ NAS as a Sonos Music Library
 
 Once NAS mode is enabled, Sonos can index and play the B3+'s music collection directly.
@@ -279,6 +312,7 @@ This compiles all AppleScripts and installs them to `/Applications`:
 - **ReleaseSonosSession.app** — release Spotify Connect on a Sonos speaker
 - **ListBrennanNAS.app** — list artists, albums and track counts on the B3+ NAS
 - **ListSonosLibrary.app** — list all artists and albums in the Sonos Music Library
+- **CompareNASSonos.app** — report discrepancies between the B3+ NAS and Sonos library
 
 ---
 
@@ -290,8 +324,10 @@ This compiles all AppleScripts and installs them to `/Applications`:
 | `scripts/release_sonos_session.sh` | Discovers Sonos speakers and releases Spotify Connect session |
 | `scripts/list_brennan_nas.sh` | Mounts B3+ NAS and lists artists, albums and track counts |
 | `scripts/list_sonos_library.sh` | Lists all artists and albums indexed in the Sonos Music Library |
+| `scripts/compare_nas_sonos.sh` | Compares NAS contents vs Sonos index and reports discrepancies |
 | `automator/ProcessQobuzFLAC.applescript` | AppleScript source for BrennanTransfer.app |
 | `automator/ReleaseSonosSession.applescript` | AppleScript source for ReleaseSonosSession.app |
 | `automator/ListBrennanNAS.applescript` | AppleScript source for ListBrennanNAS.app |
 | `automator/ListSonosLibrary.applescript` | AppleScript source for ListSonosLibrary.app |
+| `automator/CompareNASSonos.applescript` | AppleScript source for CompareNASSonos.app |
 | `install_automator_app.sh` | Compiles and installs all apps to `/Applications` |
