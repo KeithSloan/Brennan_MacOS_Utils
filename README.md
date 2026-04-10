@@ -26,6 +26,16 @@ macOS utilities for managing and transferring music between [Qobuz](https://www.
 4. Trigger a **library rescan** in the Sonos app so new tracks appear
 5. Run **CompareNASSonos** to confirm the NAS and Sonos library are in sync
 
+### Ripping a CD on the B3+
+
+The B3+ always rips CDs to WAV. Sonos cannot reliably index WAV files, so conversion to FLAC is required before Sonos will pick them up.
+
+1. Rip the CD on the B3+
+2. On the B3+: **Main Menu → Compress Now** (converts all WAV files to FLAC)
+   - Alternative: **Settings & Tools → Tools → Compress WAV to FLAC**
+3. Trigger a **library rescan** in the Sonos app
+4. Run **CompareNASSonos** — it will flag any remaining WAV albums with instructions if the compression step was missed
+
 ### Checking what is on the system
 
 | Task | Tool |
@@ -117,7 +127,7 @@ Completed      : 2026-04-07 14:32:45
 
 ## Release Sonos Session
 
-When Spotify is active on a Sonos speaker via the iPhone app, it holds a Spotify Connect session that blocks the Brennan Web UI from taking control. This utility discovers all Sonos speakers on the network, prompts you to pick one, then stops playback to release the session.
+When Spotify is active on a Sonos speaker via the iPhone app, it holds a Spotify Connect session that blocks the Brennan Web UI from taking control. This utility discovers all Sonos speakers on the network, prompts you to pick one, then stops playback to release the session. If auto-discovery fails, it prompts for the speaker's IP address (default `192.168.1.84`).
 
 ### Requirements
 
@@ -153,21 +163,21 @@ Mounts the Brennan B3+ NAS share over SMB, lists all artists and albums with per
 
 **Double-click ListBrennanNAS:**
 1. Double-click **ListBrennanNAS** in `/Applications`
-2. Enter the B3+'s IP address when prompted (find it at **Settings → Network → IP Address** on the B3+)
+2. Enter the B3+'s IP address when prompted — defaults to `192.168.1.118`
 3. The report opens automatically in TextEdit
 
 **Command line:**
 ```bash
-bash ~/github/Brennan_MacOS_Utils/scripts/list_brennan_nas.sh 192.168.x.x
+bash ~/github/Brennan_MacOS_Utils/scripts/list_brennan_nas.sh 192.168.1.118
 ```
 
 ---
 
 ## List Sonos Music Library
 
-Lists all artists and albums currently indexed in the Sonos Music Library, saves a report to `~/Music/BrennanMusic/sonos_library.txt`, and opens it in TextEdit.
+Lists all artists and albums currently indexed in the Sonos Music Library with per-album track counts, saves a report to `~/Music/BrennanMusic/sonos_library.txt`, and opens it in TextEdit.
 
-> **Note:** The Sonos Music Library is shared across all speakers. The script connects to whichever speaker is discovered first — it does not matter which one.
+> **Note:** The Sonos Music Library is shared across all speakers. The script connects to whichever speaker is discovered first — it does not matter which one. If auto-discovery fails, it prompts for the speaker's IP address (default `192.168.1.84`).
 
 ### Requirements
 
@@ -195,10 +205,11 @@ bash ~/github/Brennan_MacOS_Utils/scripts/list_sonos_library.sh
 
 Compares the Brennan B3+ NAS contents with the Sonos Music Library index and reports any discrepancies:
 
-- **On NAS but missing from Sonos** — albums uploaded to the B3+ that Sonos has not yet indexed. Fix by triggering a library rescan in the Sonos app.
+- **On NAS but missing from Sonos — not yet indexed** — FLAC/MP3 albums on the B3+ that Sonos hasn't picked up yet. Fix by triggering a library rescan in the Sonos app.
+- **On NAS but missing from Sonos — WAV files** — albums where all tracks are WAV. The B3+ always rips CDs to WAV; Sonos cannot reliably index WAV files. The report flags these with `[WAV]` and prints step-by-step instructions to compress them to FLAC on the B3+.
 - **In Sonos but missing from NAS** — albums in the Sonos index with no matching folder on the NAS. May indicate deleted files or a metadata/folder name mismatch.
 
-Comparison is case-insensitive. If everything matches the report states *"NAS and Sonos library are in sync"*.
+Comparison is case-insensitive. If everything matches the report states *"NAS and Sonos library are in sync"*. If auto-discovery of the Sonos speaker fails, it prompts for the speaker IP (default `192.168.1.84`).
 
 ### Requirements
 
@@ -213,12 +224,12 @@ Comparison is case-insensitive. If everything matches the report states *"NAS an
 
 **Double-click CompareNASSonos:**
 1. Double-click **CompareNASSonos** in `/Applications`
-2. Enter the B3+'s IP address when prompted
+2. Enter the B3+'s IP address when prompted — defaults to `192.168.1.118`
 3. The comparison report opens in TextEdit
 
 **Command line:**
 ```bash
-bash ~/github/Brennan_MacOS_Utils/scripts/compare_nas_sonos.sh 192.168.x.x
+bash ~/github/Brennan_MacOS_Utils/scripts/compare_nas_sonos.sh 192.168.1.118
 ```
 
 ---
@@ -340,7 +351,7 @@ All reports and logs are written to `~/Music/BrennanMusic/`:
 | `Transfer/` | `BrennanTransfer` | Processed FLAC files ready for upload to the B3+ |
 | `process_qobuz_flac.log` | `BrennanTransfer` | Per-file log of artwork removals and resampling |
 | `nas_contents.txt` | `ListBrennanNAS` | Artist/album/track listing from the B3+ NAS |
-| `sonos_library.txt` | `ListSonosLibrary` | Artist/album listing from the Sonos Music Library index |
+| `sonos_library.txt` | `ListSonosLibrary` | Artist/album/track listing from the Sonos Music Library index |
 | `nas_sonos_comparison.txt` | `CompareNASSonos` | Discrepancy report between NAS and Sonos library |
 
 ---
