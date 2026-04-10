@@ -73,8 +73,8 @@ if not albums:
 # Count tracks per (artist_casefold, album_casefold)
 track_counts = defaultdict(int)
 for track in tracks:
-    artist = (track.creator or "Unknown Artist").strip()
-    album  = (track.album   or "Unknown Album").strip()
+    artist = (getattr(track, 'creator', None) or getattr(track, 'artist', None) or "Unknown Artist").strip()
+    album  = (getattr(track, 'album',   None) or "Unknown Album").strip()
     track_counts[(artist.casefold(), album.casefold())] += 1
 
 # Group albums by artist
