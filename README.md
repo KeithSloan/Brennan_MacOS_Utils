@@ -12,12 +12,24 @@ macOS utilities for managing and transferring music between [Qobuz](https://www.
 
 ---
 
-## Typical workflow
+## Typical workflows
 
-1. Download album from Qobuz → run **BrennanTransfer** → processed files land in `~/Music/BrennanMusic/Transfer/`
-2. Upload via the Brennan B3+ Web UI bulk upload (or copy to NAS directly)
-3. If Spotify is playing on a Sonos speaker and the Brennan Web UI can't take control → run **ReleaseSonosSession**
-4. To verify what is on the B3+ NAS → run **ListBrennanNAS**
+### Adding new music from Qobuz
+
+1. Download album(s) from Qobuz — files land in `~/Music/QoBuz_Digital/`
+2. Run **BrennanTransfer** → processed files written to `~/Music/BrennanMusic/Transfer/`
+3. Upload via the **Brennan B3+ Web UI** bulk upload
+   - If Spotify is holding a session on your Sonos speaker and the Web UI can't take control, run **ReleaseSonosSession** first
+4. Trigger a **library rescan** in the Sonos app so new tracks appear
+5. Run **CompareNASSonos** to confirm the NAS and Sonos library are in sync
+
+### Checking what is on the system
+
+| Task | Tool |
+|------|------|
+| What's on the B3+ NAS? | **ListBrennanNAS** |
+| What has Sonos indexed? | **ListSonosLibrary** |
+| Are they in sync? | **CompareNASSonos** |
 
 ---
 
@@ -115,8 +127,8 @@ When Spotify is active on a Sonos speaker via the iPhone app, it holds a Spotify
 
 **Double-click ReleaseSonosSession:**
 1. Double-click **ReleaseSonosSession** in `/Applications`
-2. A list of discovered Sonos speakers appears — select one and click OK
-3. A notification confirms the speaker is released — the Brennan Web UI can now take control
+2. A list of all discovered Sonos speakers appears — select one and click OK
+3. A notification confirms the speaker is released and the Brennan Web UI can now take control
 
 **Command line:**
 ```bash
@@ -128,8 +140,6 @@ bash ~/github/Brennan_MacOS_Utils/scripts/release_sonos_session.sh
 ## List Brennan NAS Contents
 
 Mounts the Brennan B3+ NAS share over SMB, lists all artists and albums with per-album track counts, saves a report to `~/Music/BrennanMusic/nas_contents.txt`, and opens it in TextEdit.
-
-Useful for verifying what is on the B3+ before or after uploading music, or when setting up the B3+ as a Sonos Music Library source.
 
 ### Requirements
 
@@ -154,12 +164,12 @@ bash ~/github/Brennan_MacOS_Utils/scripts/list_brennan_nas.sh 192.168.x.x
 
 Lists all artists and albums currently indexed in the Sonos Music Library, saves a report to `~/Music/BrennanMusic/sonos_library.txt`, and opens it in TextEdit.
 
-Useful for verifying that music uploaded to the B3+ has been picked up by Sonos after indexing.
+> **Note:** The Sonos Music Library is shared across all speakers. The script connects to whichever speaker is discovered first — it does not matter which one.
 
 ### Requirements
 
 - At least one Sonos speaker on the network
-- A Music Library configured in Sonos (see below)
+- A Music Library configured in Sonos — see [Configuring the Brennan B3+ NAS as a Sonos Music Library](#configuring-the-brennan-b3-nas-as-a-sonos-music-library) below
 - Python 3 with [SoCo](https://github.com/SoCo/SoCo):
   ```bash
   pip3 install soco
@@ -176,18 +186,16 @@ Useful for verifying that music uploaded to the B3+ has been picked up by Sonos 
 bash ~/github/Brennan_MacOS_Utils/scripts/list_sonos_library.sh
 ```
 
-> **Note:** The Sonos Music Library is shared across all speakers. The script connects to whichever speaker is discovered first — it does not matter which one.
-
 ---
 
 ## Compare NAS vs Sonos Music Library
 
 Compares the Brennan B3+ NAS contents with the Sonos Music Library index and reports any discrepancies:
 
-- **On NAS but missing from Sonos** — albums uploaded to the B3+ that Sonos has not yet indexed (trigger a library rescan in the Sonos app to fix)
-- **In Sonos but missing from NAS** — albums in the Sonos index with no matching folder on the NAS (deleted files or a metadata/folder name mismatch)
+- **On NAS but missing from Sonos** — albums uploaded to the B3+ that Sonos has not yet indexed. Fix by triggering a library rescan in the Sonos app.
+- **In Sonos but missing from NAS** — albums in the Sonos index with no matching folder on the NAS. May indicate deleted files or a metadata/folder name mismatch.
 
-Comparison is case-insensitive. The report is saved to `~/Music/BrennanMusic/nas_sonos_comparison.txt` and opened in TextEdit.
+Comparison is case-insensitive. If everything matches the report states *"NAS and Sonos library are in sync"*.
 
 ### Requirements
 
@@ -235,7 +243,7 @@ On the B3+: **Settings → Network → IP Address** (e.g. `192.168.1.50`)
    \\192.168.1.50\music
    ```
    *(replace with your B3+'s actual IP address)*
-4. Enter credentials:
+4. Enter credentials when prompted:
    - **Username:** `root`
    - **Password:** `brennan`
 5. Allow Sonos to index the library — this can take several minutes for large collections
@@ -284,7 +292,7 @@ python3 --version
 
 ### 4. Install SoCo
 
-[SoCo](https://github.com/SoCo/SoCo) is a Python library for controlling Sonos speakers. Required by the Release Sonos Session utility:
+[SoCo](https://github.com/SoCo/SoCo) is a Python library for controlling Sonos speakers. Required by the Sonos utilities:
 
 ```bash
 pip3 install soco
@@ -308,11 +316,28 @@ bash ~/github/Brennan_MacOS_Utils/install_automator_app.sh
 ```
 
 This compiles all AppleScripts and installs them to `/Applications`:
-- **BrennanTransfer.app** — process Qobuz FLAC files for Brennan/Sonos
-- **ReleaseSonosSession.app** — release Spotify Connect on a Sonos speaker
-- **ListBrennanNAS.app** — list artists, albums and track counts on the B3+ NAS
-- **ListSonosLibrary.app** — list all artists and albums in the Sonos Music Library
-- **CompareNASSonos.app** — report discrepancies between the B3+ NAS and Sonos library
+
+| App | Purpose |
+|-----|---------|
+| `BrennanTransfer.app` | Process Qobuz FLAC files for Brennan/Sonos |
+| `ReleaseSonosSession.app` | Release Spotify Connect on a Sonos speaker |
+| `ListBrennanNAS.app` | List artists, albums and track counts on the B3+ NAS |
+| `ListSonosLibrary.app` | List all artists and albums in the Sonos Music Library |
+| `CompareNASSonos.app` | Report discrepancies between the B3+ NAS and Sonos library |
+
+---
+
+## Output files
+
+All reports and logs are written to `~/Music/BrennanMusic/`:
+
+| File | Written by | Contents |
+|------|-----------|----------|
+| `Transfer/` | `BrennanTransfer` | Processed FLAC files ready for upload to the B3+ |
+| `process_qobuz_flac.log` | `BrennanTransfer` | Per-file log of artwork removals and resampling |
+| `nas_contents.txt` | `ListBrennanNAS` | Artist/album/track listing from the B3+ NAS |
+| `sonos_library.txt` | `ListSonosLibrary` | Artist/album listing from the Sonos Music Library index |
+| `nas_sonos_comparison.txt` | `CompareNASSonos` | Discrepancy report between NAS and Sonos library |
 
 ---
 
