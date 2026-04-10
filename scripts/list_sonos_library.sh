@@ -33,15 +33,30 @@ fi
 osascript -e 'display notification "Connecting to Sonos Music Library…" with title "Sonos Library"'
 
 RESULT=$("$PYTHON3" - <<'PYEOF' || true
-import soco, sys, os, datetime
+import soco, sys, os, datetime, subprocess
 from collections import defaultdict
 
 # Discover speakers — the Music Library is shared across all of them
-speakers = sorted(soco.discover(timeout=5) or [], key=lambda s: s.player_name)
+speakers = sorted(soco.discover(timeout=10) or [], key=lambda s: s.player_name)
 
 if not speakers:
-    print("ERR:No Sonos speakers found on network.")
-    sys.exit(1)
+    # Discovery failed — fall back to direct IP connection
+    result = subprocess.run(
+        ["osascript", "-e",
+         'text returned of (display dialog "Sonos speaker not found automatically.\n'
+         'Enter the speaker\'s IP address:" default answer "" buttons {"Cancel", "OK"} default button "OK")'],
+        capture_output=True, text=True)
+    ip = result.stdout.strip()
+    if not ip or ip == "false":
+        print("CANCEL:")
+        sys.exit(0)
+    try:
+        s = soco.SoCo(ip)
+        _ = s.player_name  # test the connection
+        speakers = [s]
+    except Exception as e:
+        print(f"ERR:Could not connect to Sonos at {ip}: {e}")
+        sys.exit(1)
 
 speaker = speakers[0]
 ml = speaker.music_library

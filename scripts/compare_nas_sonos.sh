@@ -94,10 +94,26 @@ for artist_entry in os.scandir(mount_point):
 
 # ── Sonos library (metadata) ──────────────────────────────────────────────────
 
-speakers = sorted(soco.discover(timeout=5) or [], key=lambda s: s.player_name)
+speakers = sorted(soco.discover(timeout=10) or [], key=lambda s: s.player_name)
 if not speakers:
-    print("ERR:No Sonos speakers found on network.")
-    sys.exit(1)
+    # Discovery failed — fall back to direct IP connection
+    import subprocess
+    result = subprocess.run(
+        ["osascript", "-e",
+         'text returned of (display dialog "Sonos speaker not found automatically.\n'
+         'Enter the speaker\'s IP address:" default answer "" buttons {"Cancel", "OK"} default button "OK")'],
+        capture_output=True, text=True)
+    ip = result.stdout.strip()
+    if not ip or ip == "false":
+        print("CANCEL:")
+        sys.exit(0)
+    try:
+        s = soco.SoCo(ip)
+        _ = s.player_name  # test the connection
+        speakers = [s]
+    except Exception as e:
+        print(f"ERR:Could not connect to Sonos at {ip}: {e}")
+        sys.exit(1)
 
 ml = speakers[0].music_library
 
