@@ -4,6 +4,7 @@ macOS utilities for managing and transferring music between [Qobuz](https://www.
 
 | App | Script | Purpose |
 |-----|--------|---------|
+| `BrennanUtils.app` | `brennan_utils.sh` | **Launcher** — presents a menu of all utilities |
 | `BrennanTransfer.app` | `process_qobuz_flac.sh` | Strip artwork & downsample Qobuz FLAC files ready for Brennan/Sonos |
 | `ReleaseSonosSession.app` | `release_sonos_session.sh` | Release a Spotify Connect session so the Brennan Web UI can take control |
 | `ListBrennanNAS.app` | `list_brennan_nas.sh` | List all artists, albums and track counts on the Brennan B3+ NAS |
@@ -13,6 +14,8 @@ macOS utilities for managing and transferring music between [Qobuz](https://www.
 ---
 
 ## Typical workflows
+
+**Tip:** double-click **BrennanUtils** for a single menu that launches any of the utilities below.
 
 ### Adding new music from Qobuz
 
@@ -319,6 +322,7 @@ This compiles all AppleScripts and installs them to `/Applications`:
 
 | App | Purpose |
 |-----|---------|
+| `BrennanUtils.app` | **Launcher** — menu to run any of the utilities below |
 | `BrennanTransfer.app` | Process Qobuz FLAC files for Brennan/Sonos |
 | `ReleaseSonosSession.app` | Release Spotify Connect on a Sonos speaker |
 | `ListBrennanNAS.app` | List artists, albums and track counts on the B3+ NAS |
@@ -345,11 +349,13 @@ All reports and logs are written to `~/Music/BrennanMusic/`:
 
 | File | Purpose |
 |------|---------|
+| `scripts/brennan_utils.sh` | Launcher — presents a menu and runs the selected utility |
 | `scripts/process_qobuz_flac.sh` | Strips artwork and downsamples Qobuz FLAC files, writes log |
 | `scripts/release_sonos_session.sh` | Discovers Sonos speakers and releases Spotify Connect session |
 | `scripts/list_brennan_nas.sh` | Mounts B3+ NAS and lists artists, albums and track counts |
 | `scripts/list_sonos_library.sh` | Lists all artists and albums indexed in the Sonos Music Library |
 | `scripts/compare_nas_sonos.sh` | Compares NAS contents vs Sonos index and reports discrepancies |
+| `automator/BrennanUtils.applescript` | AppleScript source for BrennanUtils.app |
 | `automator/ProcessQobuzFLAC.applescript` | AppleScript source for BrennanTransfer.app |
 | `automator/ReleaseSonosSession.applescript` | AppleScript source for ReleaseSonosSession.app |
 | `automator/ListBrennanNAS.applescript` | AppleScript source for ListBrennanNAS.app |
