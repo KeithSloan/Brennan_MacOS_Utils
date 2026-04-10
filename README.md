@@ -94,6 +94,35 @@ bash ~/github/Brennan_MacOS_Utils/scripts/release_sonos_session.sh
 
 ---
 
+## List Brennan NAS Contents
+
+Mounts the Brennan B3+ NAS share, lists all artists and albums with track counts, writes a report to `~/Music/BrennanMusic/nas_contents.txt`, and opens it in TextEdit.
+
+Useful for verifying what is on the B3 before or after configuring it as a Sonos Music Library.
+
+### Requirements
+
+- NAS mode enabled on the B3: **Settings & Tools → Maintenance → Start NAS**
+- B3+ and Mac on the same network
+
+### Usage
+
+#### Double-click ListBrennanNAS
+
+1. Double-click **ListBrennanNAS** in `/Applications`
+2. Enter the B3+'s IP address when prompted
+3. The report opens automatically in TextEdit
+
+#### Command line
+
+```bash
+bash ~/github/Brennan_MacOS_Utils/scripts/list_brennan_nas.sh 192.168.x.x
+```
+
+Report is saved to `~/Music/BrennanMusic/nas_contents.txt`.
+
+---
+
 ## Installation
 
 ### 1. Install Homebrew (if not already installed)
@@ -158,9 +187,10 @@ git clone https://github.com/KeithSloan/Brennan_MacOS_Utils.git ~/github/Brennan
 bash ~/github/Brennan_MacOS_Utils/install_automator_app.sh
 ```
 
-This compiles both AppleScripts and installs them to `/Applications`:
+This compiles all AppleScripts and installs them to `/Applications`:
 - **BrennanTransfer.app** — process Qobuz FLAC files for Brennan/Sonos
-- **ReleaseSonosSession.app** — release Spotify Connect on the Family Room Sonos
+- **ReleaseSonosSession.app** — release Spotify Connect on a Sonos speaker
+- **ListBrennanNAS.app** — list artists, albums and track counts on the B3+ NAS
 
 ---
 
@@ -191,7 +221,9 @@ bash ~/github/Brennan_MacOS_Utils/scripts/process_qobuz_flac.sh ~/Music/QoBuz_Di
 | File | Purpose |
 |------|---------|
 | `scripts/process_qobuz_flac.sh` | Core processing script — strips artwork, downsamples if >48 kHz, writes log |
-| `scripts/release_sonos_session.sh` | Stops playback on Family Room Sonos to release Spotify Connect session |
+| `scripts/release_sonos_session.sh` | Stops playback on a Sonos speaker to release Spotify Connect session |
+| `scripts/list_brennan_nas.sh` | Mounts B3+ NAS and lists artists, albums and track counts |
 | `automator/ProcessQobuzFLAC.applescript` | AppleScript source for the BrennanTransfer app |
 | `automator/ReleaseSonosSession.applescript` | AppleScript source for the ReleaseSonosSession app |
-| `install_automator_app.sh` | Compiles and installs both apps to `/Applications` |
+| `automator/ListBrennanNAS.applescript` | AppleScript source for the ListBrennanNAS app |
+| `install_automator_app.sh` | Compiles and installs all apps to `/Applications` |

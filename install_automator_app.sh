@@ -17,3 +17,4 @@ install_app() {
 
 install_app "${REPO_DIR}/automator/ProcessQobuzFLAC.applescript"   "/Applications/BrennanTransfer.app"
 install_app "${REPO_DIR}/automator/ReleaseSonosSession.applescript" "/Applications/ReleaseSonosSession.app"
+install_app "${REPO_DIR}/automator/ListBrennanNAS.applescript"      "/Applications/ListBrennanNAS.app"
