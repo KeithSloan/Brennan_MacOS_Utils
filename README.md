@@ -5,7 +5,7 @@ macOS utilities for managing and transferring music between [Qobuz](https://www.
 | App | Script | Purpose |
 |-----|--------|---------|
 | `BrennanUtils.app` | `brennan_utils.sh` | **Launcher** — presents a menu of all utilities |
-| `BrennanTransfer.app` | `process_qobuz_flac.sh` | Strip artwork & downsample Qobuz FLAC files ready for Brennan/Sonos |
+| `BrennanTransfer.app` | `process_qobuz_flac.sh` | Strip artwork from FLAC & downsample Qobuz FLAC files ready for Brennan/Sonos |
 | `ReleaseSonosSession.app` | `release_sonos_session.sh` | Release a Spotify Connect session so the Brennan Web UI can take control |
 | `ListBrennanNAS.app` | `list_brennan_nas.sh` | List all artists, albums and track counts on the Brennan B3+ NAS |
 | `ListSonosLibrary.app` | `list_sonos_library.sh` | List all artists and albums indexed in the Sonos Music Library |
