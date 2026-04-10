@@ -10,12 +10,26 @@
 
 set -euo pipefail
 
-if ! python3 -c "import soco" 2>/dev/null; then
+# Find a Python installation that has soco — miniconda, Homebrew, or PATH
+find_python3() {
+    for p in \
+        "${HOME}/miniconda3/bin/python3" \
+        "${HOME}/opt/miniconda3/bin/python3" \
+        "/opt/miniconda3/bin/python3" \
+        "/opt/homebrew/bin/python3" \
+        "/usr/local/bin/python3" \
+        "$(command -v python3 2>/dev/null)"; do
+        [[ -x "$p" ]] && "$p" -c "import soco" 2>/dev/null && echo "$p" && return 0
+    done
+    return 1
+}
+
+if ! PYTHON3=$(find_python3); then
     osascript -e 'display dialog "soco not installed.\nRun: pip3 install soco" buttons {"OK"} default button "OK" with icon stop'
     exit 1
 fi
 
-RESULT=$(python3 - <<'PYEOF'
+RESULT=$("$PYTHON3" - <<'PYEOF'
 import soco, sys, subprocess
 
 speakers = sorted(soco.discover(timeout=5) or [], key=lambda s: s.player_name)

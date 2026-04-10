@@ -19,7 +19,21 @@ SHARE_NAME="music"
 MOUNT_POINT="/tmp/brennan_nas_$$"
 REPORT_FILE="${HOME}/Music/BrennanMusic/nas_sonos_comparison.txt"
 
-if ! python3 -c "import soco" 2>/dev/null; then
+# Find a Python installation that has soco — miniconda, Homebrew, or PATH
+find_python3() {
+    for p in \
+        "${HOME}/miniconda3/bin/python3" \
+        "${HOME}/opt/miniconda3/bin/python3" \
+        "/opt/miniconda3/bin/python3" \
+        "/opt/homebrew/bin/python3" \
+        "/usr/local/bin/python3" \
+        "$(command -v python3 2>/dev/null)"; do
+        [[ -x "$p" ]] && "$p" -c "import soco" 2>/dev/null && echo "$p" && return 0
+    done
+    return 1
+}
+
+if ! PYTHON3=$(find_python3); then
     osascript -e 'display dialog "soco not installed.\nRun: pip3 install soco" buttons {"OK"} default button "OK" with icon stop'
     exit 1
 fi
@@ -57,7 +71,7 @@ fi
 
 # ── Compare ───────────────────────────────────────────────────────────────────
 
-RESULT=$(python3 - "$MOUNT_POINT" <<'PYEOF'
+RESULT=$("$PYTHON3" - "$MOUNT_POINT" <<'PYEOF'
 import sys, os, soco, datetime
 from collections import defaultdict
 
