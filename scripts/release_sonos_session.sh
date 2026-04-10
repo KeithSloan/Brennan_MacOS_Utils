@@ -29,7 +29,7 @@ if ! PYTHON3=$(find_python3); then
     exit 1
 fi
 
-RESULT=$("$PYTHON3" - <<'PYEOF'
+RESULT=$("$PYTHON3" - <<'PYEOF' || true
 import soco, sys, subprocess
 
 speakers = sorted(soco.discover(timeout=5) or [], key=lambda s: s.player_name)

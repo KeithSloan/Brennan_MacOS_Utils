@@ -71,7 +71,7 @@ fi
 
 # ── Compare ───────────────────────────────────────────────────────────────────
 
-RESULT=$("$PYTHON3" - "$MOUNT_POINT" <<'PYEOF'
+RESULT=$("$PYTHON3" - "$MOUNT_POINT" <<'PYEOF' || true
 import sys, os, soco, datetime
 from collections import defaultdict
 

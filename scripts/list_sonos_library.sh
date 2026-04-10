@@ -32,7 +32,7 @@ fi
 
 osascript -e 'display notification "Connecting to Sonos Music Library…" with title "Sonos Library"'
 
-RESULT=$("$PYTHON3" - <<'PYEOF'
+RESULT=$("$PYTHON3" - <<'PYEOF' || true
 import soco, sys, os, datetime
 from collections import defaultdict
 
