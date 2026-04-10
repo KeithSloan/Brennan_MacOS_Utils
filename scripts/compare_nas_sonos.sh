@@ -43,7 +43,7 @@ fi
 if [[ $# -ge 1 ]]; then
     B3_IP="$1"
 else
-    B3_IP=$(osascript -e 'text returned of (display dialog "Enter Brennan B3+ IP address:" default answer "" buttons {"Cancel", "OK"} default button "OK")' 2>/dev/null || true)
+    B3_IP=$(osascript -e 'text returned of (display dialog "Enter Brennan B3+ IP address:" default answer "192.168.1.84" buttons {"Cancel", "OK"} default button "OK")' 2>/dev/null || true)
 fi
 
 if [[ -z "$B3_IP" ]]; then
@@ -98,7 +98,7 @@ speakers = sorted(soco.discover(timeout=10) or [], key=lambda s: s.player_name)
 if not speakers:
     # Discovery failed — fall back to direct IP connection
     import subprocess
-    script = 'text returned of (display dialog "Sonos speaker not found automatically. Enter the speaker IP address:" default answer "" buttons {"Cancel", "OK"} default button "OK")'
+    script = 'text returned of (display dialog "Sonos speaker not found automatically. Enter the speaker IP address:" default answer "192.168.1.84" buttons {"Cancel", "OK"} default button "OK")'
     result = subprocess.run(["osascript", "-e", script], capture_output=True, text=True)
     ip = result.stdout.strip()
     if not ip or ip == "false":
