@@ -77,9 +77,16 @@ from collections import defaultdict
 
 mount_point = sys.argv[1]
 
-# ── NAS contents (folder names) ───────────────────────────────────────────────
+# ── NAS contents (folder names + file types) ─────────────────────────────────
 
-nas_albums = {}   # (artist_lower, album_lower) → (artist_display, album_display)
+nas_albums    = {}   # (artist_lower, album_lower) → (artist_display, album_display)
+nas_album_wav = set()  # keys where all music files are WAV
+
+def album_is_wav(album_path):
+    exts = {os.path.splitext(f.name)[1].lower()
+            for f in os.scandir(album_path) if f.is_file()}
+    music_exts = exts & {'.wav', '.flac', '.mp3', '.m4a'}
+    return bool(music_exts) and music_exts == {'.wav'}
 
 for artist_entry in os.scandir(mount_point):
     if not artist_entry.is_dir():
@@ -91,6 +98,8 @@ for artist_entry in os.scandir(mount_point):
         album_name = album_entry.name
         key = (artist_name.casefold(), album_name.casefold())
         nas_albums[key] = (artist_name, album_name)
+        if album_is_wav(album_entry.path):
+            nas_album_wav.add(key)
 
 # ── Sonos library (metadata) ──────────────────────────────────────────────────
 
@@ -147,16 +156,37 @@ with open(report_path, "w") as f:
         f.write("No discrepancies found — NAS and Sonos library are in sync.\n")
     else:
         if nas_only:
-            f.write(f"ON NAS BUT MISSING FROM SONOS ({len(nas_only)}) ────────────────────────────\n")
-            f.write("These albums are on the B3+ NAS but have not been indexed by Sonos.\n")
-            f.write("Tip: trigger a library rescan in the Sonos app.\n\n")
-            current_artist = None
-            for artist, album in sorted(nas_only.values(), key=lambda x: (x[0].casefold(), x[1].casefold())):
-                if artist != current_artist:
-                    f.write(f"  {artist}/\n")
-                    current_artist = artist
-                f.write(f"    {album}\n")
-            f.write("\n")
+            wav_albums   = {k: v for k, v in nas_only.items() if k in nas_album_wav}
+            other_albums = {k: v for k, v in nas_only.items() if k not in nas_album_wav}
+
+            f.write(f"ON NAS BUT MISSING FROM SONOS ({len(nas_only)}) ────────────────────────────\n\n")
+
+            if other_albums:
+                f.write(f"  Not yet indexed ({len(other_albums)}) — trigger a library rescan in the Sonos app:\n")
+                current_artist = None
+                for artist, album in sorted(other_albums.values(), key=lambda x: (x[0].casefold(), x[1].casefold())):
+                    if artist != current_artist:
+                        f.write(f"    {artist}/\n")
+                        current_artist = artist
+                    f.write(f"      {album}\n")
+                f.write("\n")
+
+            if wav_albums:
+                f.write(f"  WAV files — need converting to FLAC before Sonos can index them ({len(wav_albums)}):\n")
+                current_artist = None
+                for artist, album in sorted(wav_albums.values(), key=lambda x: (x[0].casefold(), x[1].casefold())):
+                    if artist != current_artist:
+                        f.write(f"    {artist}/\n")
+                        current_artist = artist
+                    f.write(f"      {album}  [WAV]\n")
+                f.write("\n")
+                f.write("  *** ACTION REQUIRED — Compress WAV to FLAC on the Brennan B3+ ***\n")
+                f.write("  The Brennan always rips CDs to WAV. Sonos cannot reliably index WAV\n")
+                f.write("  files. Convert them to FLAC using either of these methods:\n\n")
+                f.write("  Quick:   Main Menu → Compress Now\n")
+                f.write("  Full:    Settings & Tools → Tools → Compress WAV to FLAC\n\n")
+                f.write("  After compression completes, trigger a Sonos library rescan.\n")
+                f.write("\n")
 
         if sonos_only:
             f.write(f"IN SONOS BUT MISSING FROM NAS ({len(sonos_only)}) ─────────────────────────────\n")
