@@ -21,7 +21,7 @@ REPORT_FILE="${HOME}/Music/BrennanMusic/nas_contents.txt"
 if [[ $# -ge 1 ]]; then
     B3_IP="$1"
 else
-    B3_IP=$(osascript -e 'text returned of (display dialog "Enter Brennan B3+ IP address:" default answer "" buttons {"Cancel", "OK"} default button "OK")' 2>/dev/null || true)
+    B3_IP=$(osascript -e 'text returned of (display dialog "Enter Brennan B3+ IP address:" default answer "192.168.1.118" buttons {"Cancel", "OK"} default button "OK")' 2>/dev/null || true)
 fi
 
 if [[ -z "$B3_IP" ]]; then
