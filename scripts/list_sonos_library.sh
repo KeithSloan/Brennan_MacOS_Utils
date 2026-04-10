@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+# list_sonos_library.sh
+# Connects to any discovered Sonos speaker and lists the shared Music Library
+# by artist and album, writing a report to ~/Music/BrennanMusic/sonos_library.txt.
+#
+# Requires: pip3 install soco
+#
+# Usage: list_sonos_library.sh
+
+set -euo pipefail
+
+REPORT_FILE="${HOME}/Music/BrennanMusic/sonos_library.txt"
+
+if ! python3 -c "import soco" 2>/dev/null; then
+    osascript -e 'display dialog "soco not installed.\nRun: pip3 install soco" buttons {"OK"} default button "OK" with icon stop'
+    exit 1
+fi
+
+osascript -e 'display notification "Connecting to Sonos Music Library…" with title "Sonos Library"'
+
+RESULT=$(python3 - <<'PYEOF'
+import soco, sys, subprocess
+from collections import defaultdict
+
+# Discover speakers — the Music Library is shared across all of them
+speakers = sorted(soco.discover(timeout=5) or [], key=lambda s: s.player_name)
+
+if not speakers:
+    print("ERR:No Sonos speakers found on network.")
+    sys.exit(1)
+
+speaker = speakers[0]
+ml = speaker.music_library
+
+# Fetch all albums (each album carries its artist via .creator)
+try:
+    albums = list(ml.get_albums(complete_result=True))
+except Exception as e:
+    print(f"ERR:Could not read Sonos Music Library: {e}")
+    sys.exit(1)
+
+if not albums:
+    print("ERR:Sonos Music Library appears to be empty or has not finished indexing.")
+    sys.exit(1)
+
+# Group albums by artist
+by_artist = defaultdict(list)
+for album in albums:
+    artist = (album.creator or "Unknown Artist").strip()
+    by_artist[artist].append((album.title or "Unknown Album").strip())
+
+# Sort artists and their albums
+report_lines = []
+for artist in sorted(by_artist.keys(), key=str.casefold):
+    report_lines.append(f"{artist}/")
+    for album_title in sorted(by_artist[artist], key=str.casefold):
+        report_lines.append(f"  {album_title}")
+    report_lines.append("")
+
+artist_count = len(by_artist)
+album_count  = len(albums)
+
+# Write report
+import os, datetime
+os.makedirs(os.path.expanduser("~/Music/BrennanMusic"), exist_ok=True)
+report_path = os.path.expanduser("~/Music/BrennanMusic/sonos_library.txt")
+
+with open(report_path, "w") as f:
+    f.write(f"Sonos Music Library — {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+    f.write(f"Source speaker : {speaker.player_name}\n")
+    f.write("---\n")
+    f.write(f"Artists : {artist_count}\n")
+    f.write(f"Albums  : {album_count}\n")
+    f.write("---\n\n")
+    f.write("\n".join(report_lines))
+
+print(f"OK:{artist_count} artists · {album_count} albums")
+PYEOF
+)
+
+if [[ "$RESULT" == OK:* ]]; then
+    open -a TextEdit "$REPORT_FILE"
+    osascript -e "display notification \"${RESULT#OK:} — report saved\" with title \"Sonos Library\""
+    echo "${RESULT#OK:} — report saved to ${REPORT_FILE}"
+else
+    MSG="${RESULT#ERR:}"
+    osascript -e "display dialog \"$MSG\" buttons {\"OK\"} default button \"OK\" with icon stop"
+    exit 1
+fi

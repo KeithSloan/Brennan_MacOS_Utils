@@ -7,6 +7,7 @@ macOS utilities for managing and transferring music between [Qobuz](https://www.
 | `BrennanTransfer.app` | `process_qobuz_flac.sh` | Strip artwork & downsample Qobuz FLAC files ready for Brennan/Sonos |
 | `ReleaseSonosSession.app` | `release_sonos_session.sh` | Release a Spotify Connect session so the Brennan Web UI can take control |
 | `ListBrennanNAS.app` | `list_brennan_nas.sh` | List all artists, albums and track counts on the Brennan B3+ NAS |
+| `ListSonosLibrary.app` | `list_sonos_library.sh` | List all artists and albums indexed in the Sonos Music Library |
 
 ---
 
@@ -148,6 +149,36 @@ bash ~/github/Brennan_MacOS_Utils/scripts/list_brennan_nas.sh 192.168.x.x
 
 ---
 
+## List Sonos Music Library
+
+Lists all artists and albums currently indexed in the Sonos Music Library, saves a report to `~/Music/BrennanMusic/sonos_library.txt`, and opens it in TextEdit.
+
+Useful for verifying that music uploaded to the B3+ has been picked up by Sonos after indexing.
+
+### Requirements
+
+- At least one Sonos speaker on the network
+- A Music Library configured in Sonos (see below)
+- Python 3 with [SoCo](https://github.com/SoCo/SoCo):
+  ```bash
+  pip3 install soco
+  ```
+
+### Usage
+
+**Double-click ListSonosLibrary:**
+1. Double-click **ListSonosLibrary** in `/Applications`
+2. The report opens automatically in TextEdit once the library has been read
+
+**Command line:**
+```bash
+bash ~/github/Brennan_MacOS_Utils/scripts/list_sonos_library.sh
+```
+
+> **Note:** The Sonos Music Library is shared across all speakers. The script connects to whichever speaker is discovered first — it does not matter which one.
+
+---
+
 ## Configuring the Brennan B3+ NAS as a Sonos Music Library
 
 Once NAS mode is enabled, Sonos can index and play the B3+'s music collection directly.
@@ -247,6 +278,7 @@ This compiles all AppleScripts and installs them to `/Applications`:
 - **BrennanTransfer.app** — process Qobuz FLAC files for Brennan/Sonos
 - **ReleaseSonosSession.app** — release Spotify Connect on a Sonos speaker
 - **ListBrennanNAS.app** — list artists, albums and track counts on the B3+ NAS
+- **ListSonosLibrary.app** — list all artists and albums in the Sonos Music Library
 
 ---
 
@@ -257,7 +289,9 @@ This compiles all AppleScripts and installs them to `/Applications`:
 | `scripts/process_qobuz_flac.sh` | Strips artwork and downsamples Qobuz FLAC files, writes log |
 | `scripts/release_sonos_session.sh` | Discovers Sonos speakers and releases Spotify Connect session |
 | `scripts/list_brennan_nas.sh` | Mounts B3+ NAS and lists artists, albums and track counts |
+| `scripts/list_sonos_library.sh` | Lists all artists and albums indexed in the Sonos Music Library |
 | `automator/ProcessQobuzFLAC.applescript` | AppleScript source for BrennanTransfer.app |
 | `automator/ReleaseSonosSession.applescript` | AppleScript source for ReleaseSonosSession.app |
 | `automator/ListBrennanNAS.applescript` | AppleScript source for ListBrennanNAS.app |
+| `automator/ListSonosLibrary.applescript` | AppleScript source for ListSonosLibrary.app |
 | `install_automator_app.sh` | Compiles and installs all apps to `/Applications` |
